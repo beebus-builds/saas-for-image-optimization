@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6c5ce7">
+<meta name="description" content="Free online image tools: compress, resize, convert, crop, filter, watermark, and more. All in your browser — no uploads.">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>ImagePro — image tools for the rest of us</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0b14;--surface:#14131f;--surface2:#1d1c2c;--surface3:#2a2840;
+  --accent:#7c6cf0;--accent2:#b4a9ff;--accent-warm:#f0a06c;--accent-glow:rgba(124,108,240,.2);
+  --text:#eceaf2;--text2:#9990b8;--text3:#6a6288;
+  --success:#3ddc97;--warning:#ffbc6e;--error:#ff6b6b;
+  --radius:16px;--radius-sm:10px;--radius-full:9999px;
+  --shadow:0 8px 48px rgba(0,0,0,.5);--shadow-sm:0 2px 16px rgba(0,0,0,.3);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --ease-bounce:cubic-bezier(.34,1.56,.64,1);
+  --ease-spring:cubic-bezier(.22,1,.36,1);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+a{color:var(--accent2);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent)}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:7px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:#3a3860}
+
+/* Glass Header */
+header{background:rgba(20,19,31,.88);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);padding:0 28px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;height:68px;gap:28px;position:sticky;top:0;z-index:100}
+.logo{font-weight:900;font-size:1.15rem;letter-spacing:-.4px;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:10px}
+.logo::before{content:'\2728';font-size:1.2rem;-webkit-text-fill-color:initial;transition:transform .3s var(--ease-bounce)}
+.logo:hover::before{animation:wiggle .4s var(--ease-bounce)}
+header nav{margin-left:auto;display:flex;gap:2px;align-items:center}
+header nav a,header nav button{color:var(--text2);font-size:.85rem;padding:8px 18px;border-radius:var(--radius-full);border:none;background:transparent;cursor:pointer;transition:all .2s;font-family:var(--font);font-weight:500;position:relative}
+header nav a:hover,header nav button:hover{color:var(--text);background:rgba(255,255,255,.06)}
+header nav a.active{color:#fff;background:rgba(124,108,240,.18)}
+
+/* Page sections */
+.page{display:none;padding:48px 28px 80px;flex:1}
+.page.active{display:block;animation:fadeUp .5s var(--ease-spring)}
+.container{max-width:1080px;margin:0 auto}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* Hero */
+.hero{text-align:center;padding:80px 0 48px;position:relative}
+.hero::before{content:'';position:absolute;top:40%;left:50%;width:700px;height:700px;background:radial-gradient(circle,rgba(124,108,240,.12) 0%,rgba(240,160,108,.05) 40%,transparent 70%);transform:translate(-50%,-50%);pointer-events:none}
+.hero h1{font-size:3.2rem;font-weight:900;margin-bottom:16px;letter-spacing:-1.5px;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;position:relative}
+.hero p{font-size:1.1rem;color:var(--text2);max-width:580px;margin:0 auto 36px;line-height:1.8;position:relative}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 34px;border-radius:var(--radius-full);border:none;cursor:pointer;font-weight:600;font-size:.9rem;transition:all .25s var(--ease-spring);font-family:var(--font);position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.08);opacity:0;transition:opacity .3s}
+.btn:hover::after{opacity:1}
+.btn:hover{transform:translateY(-3px) scale(1.02)}
+.btn:active{transform:translateY(-1px) scale(.98);transition-duration:.05s}
+.btn-accent{background:linear-gradient(135deg,var(--accent),#6a5cd8);color:#fff;box-shadow:0 4px 20px rgba(124,108,240,.25)}
+.btn-accent:hover{box-shadow:0 8px 36px rgba(124,108,240,.4)}
+.btn-outline{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--text)}
+.btn-outline:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18)}
+.btn-ghost{color:var(--text2);padding:8px 18px;border-radius:var(--radius-sm);font-weight:500}
+.btn-ghost:hover{color:var(--text);background:rgba(255,255,255,.06);transform:none;box-shadow:none}
+.btn-sm{padding:9px 22px;font-size:.82rem}
+.btn-xs{padding:5px 14px;font-size:.75rem;border-radius:8px}
+
+/* Features grid */
+.features{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;margin:52px 0 20px;position:relative}
+.feature{background:var(--surface);border-radius:var(--radius);padding:28px 22px 24px;text-align:center;border:1px solid rgba(255,255,255,.03);transition:all .35s var(--ease-spring);cursor:default;position:relative;overflow:hidden}
+.feature::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .35s}
+.feature:hover{transform:translateY(-6px);border-color:rgba(124,108,240,.15);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.feature:hover::before{opacity:1}
+.feature .icon{font-size:1.6rem;margin-bottom:12px;display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;background:var(--surface2);border-radius:16px;border:1px solid rgba(255,255,255,.04);transition:all .3s}
+.feature:hover .icon{background:rgba(124,108,240,.1);border-color:rgba(124,108,240,.15);transform:scale(1.05) rotate(-2deg)}
+.feature h3{font-size:.95rem;font-weight:700;margin-bottom:6px;letter-spacing:-.2px}
+.feature p{font-size:.8rem;color:var(--text2);line-height:1.6}
+
+/* Pricing */
+.pricing{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;margin:48px 0}
+.plan{background:var(--surface);border-radius:var(--radius);padding:36px 32px 32px;text-align:center;border:1px solid rgba(255,255,255,.03);position:relative;transition:all .35s var(--ease-spring)}
+.plan:hover{transform:translateY(-6px);box-shadow:0 16px 56px rgba(0,0,0,.35)}
+.plan.featured{border-color:rgba(124,108,240,.2);background:linear-gradient(180deg,rgba(124,108,240,.06),var(--surface))}
+.plan.featured:hover{border-color:rgba(124,108,240,.35)}
+.plan .badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent),var(--accent-warm));color:#fff;padding:5px 22px;border-radius:var(--radius-full);font-size:.7rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;box-shadow:0 4px 16px rgba(124,108,240,.3)}
+.plan h3{font-size:1.3rem;margin-bottom:4px;font-weight:800;letter-spacing:-.4px}
+.plan .price{font-size:2.8rem;font-weight:900;margin:18px 0;letter-spacing:-1.5px}
+.plan .price span{font-size:.95rem;color:var(--text2);font-weight:500}
+.plan ul{list-style:none;text-align:left;padding:0 4px;margin:22px 0}
+.plan ul li{padding:9px 0;font-size:.85rem;color:var(--text2);display:flex;align-items:center;gap:10px}
+.plan ul li::before{content:'\2713';display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:rgba(61,220,151,.12);color:var(--success);border-radius:50%;font-size:.7rem;font-weight:700;flex-shrink:0}
+
+/* Tool section */
+.tool-section{background:var(--surface);border-radius:var(--radius);padding:28px;margin-top:20px;border:1px solid rgba(255,255,255,.03)}
+.tool-section h2{margin-bottom:20px;font-size:1.1rem;font-weight:700;letter-spacing:-.3px}
+.tool-tab{background:var(--surface2);border:1px solid rgba(255,255,255,.05);color:var(--text2);padding:8px 20px;border-radius:var(--radius-full);cursor:pointer;font-size:.8rem;font-family:var(--font);font-weight:500;transition:all .2s}
+.tool-tab:hover{color:var(--text);border-color:rgba(255,255,255,.12);background:var(--surface3);transform:translateY(-1px)}
+.tool-tab.active{background:linear-gradient(135deg,var(--accent),#6a5cd8);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(124,108,240,.25)}
+
+/* Toast */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(8px);background:rgba(20,19,31,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:var(--text);padding:14px 30px;border-radius:var(--radius-full);border:1px solid rgba(255,255,255,.06);font-size:.85rem;font-weight:500;opacity:0;transition:opacity .35s,transform .35s var(--ease-spring);z-index:300;pointer-events:none;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Dropzone */
+#dropzone{border:2px dashed rgba(255,255,255,.08);border-radius:var(--radius);padding:44px 24px;text-align:center;cursor:pointer;background:var(--surface2);margin-bottom:14px;transition:all .35s var(--ease-spring);position:relative}
+#dropzone:hover{border-color:var(--accent);background:rgba(124,108,240,.05)}
+#dropzone.dragover{border-color:var(--accent-warm);background:rgba(240,160,108,.06);transform:scale(1.015);border-style:solid}
+#dropzone .dz-icon{font-size:2.6rem;margin-bottom:10px;display:inline-block;transition:transform .35s var(--ease-bounce)}
+#dropzone:hover .dz-icon{transform:scale(1.15) rotate(-3deg)}
+
+/* Dashboard */
+.dash-banner{background:linear-gradient(135deg,rgba(124,108,240,.08),rgba(240,160,108,.04));border-radius:var(--radius);padding:18px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border:1px solid rgba(124,108,240,.12)}
+.dash-banner span{font-size:.85rem;color:var(--text2)}
+
+/* Inputs */
+input,select{font-family:var(--font);color:var(--text);background:var(--surface2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-sm);padding:9px 14px;font-size:.85rem;transition:border-color .25s,box-shadow .25s;outline:none}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(124,108,240,.12)}
+input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);border-radius:5px}
+input[type=number]::-webkit-inner-spin-button{opacity:.4}
+input[type=range]{-webkit-appearance:none;appearance:none;height:5px;background:var(--surface3);border-radius:8px;outline:none;border:none;padding:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--surface2);box-shadow:0 2px 8px rgba(0,0,0,.3);transition:transform .2s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+input[type=color]{border:none;background:transparent;cursor:pointer;padding:0;width:40px;height:32px}
+
+/* Result cards */
+#toolResults{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));margin-top:16px}
+.result-card{background:var(--surface2);border-radius:var(--radius);overflow:hidden;border:1px solid rgba(255,255,255,.03);transition:all .35s var(--ease-spring)}
+.result-card:hover{transform:translateY(-4px) scale(1.005);box-shadow:0 16px 48px rgba(0,0,0,.35);border-color:rgba(255,255,255,.06)}
+.result-card.card-processing{animation:pulse 1s ease-in-out infinite;border-color:var(--accent)}
+.result-card .card-img-wrap{background:#0a0912;position:relative;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.result-card .card-img-wrap img{max-width:100%;max-height:100%;object-fit:contain;transition:transform .4s var(--ease-spring)}
+.result-card:hover .card-img-wrap img{transform:scale(1.05)}
+.result-card .card-badges{position:absolute;top:8px;right:8px;display:flex;gap:4px}
+.result-card .card-body{padding:14px 16px}
+.result-card .card-name{font-size:.8rem;font-weight:600;word-break:break-all;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.result-card .card-actions{margin-top:10px;display:flex;gap:4px;flex-wrap:wrap}
+.result-card .card-action-btn{padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:var(--text2);cursor:pointer;font-size:.72rem;font-weight:600;transition:all .2s;font-family:var(--font)}
+.result-card .card-action-btn:hover{color:var(--text);background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);transform:translateY(-1px)}
+.result-card .card-action-btn:disabled{opacity:.3;cursor:default;transform:none}
+.result-card .card-action-btn.primary{background:var(--accent);color:#fff;border-color:transparent}
+.result-card .card-action-btn.primary:hover{background:#6a5cd8;box-shadow:0 4px 16px rgba(124,108,240,.25)}
+.result-card .card-action-btn.danger:hover{color:var(--error);border-color:rgba(255,107,107,.2)}
+
+/* Compare modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.modal-overlay.open{display:flex;animation:fadeIn .25s ease}
+.modal{background:var(--surface);border-radius:var(--radius);max-width:92vw;width:auto;padding:24px;box-shadow:0 32px 96px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.05)}
+.modal h2{margin-bottom:16px;font-size:1.1rem;font-weight:700}
+.modal-close{float:right;background:rgba(255,255,255,.06);border:none;color:var(--text2);width:34px;height:34px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:rgba(255,255,255,.12);color:var(--text);transform:rotate(90deg)}
+
+/* Footer */
+footer{margin-top:auto;padding:24px 28px;text-align:center;font-size:.8rem;color:var(--text3);border-top:1px solid rgba(255,255,255,.03)}
+
+/* Free banner */
+.free-banner{background:linear-gradient(135deg,rgba(124,108,240,.06),rgba(240,160,108,.03));border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border:1px solid rgba(124,108,240,.1)}
+
+/* Utility */
+.tool-label{font-size:.82rem;color:var(--text2);font-weight:500}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mt-2{margin-top:12px}
+.gap-sm{gap:6px}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Responsive */
+@media(max-width:640px){
+  .hero h1{font-size:2.2rem}
+  .hero p{font-size:.95rem}
+  .features{grid-template-columns:1fr 1fr}
+  .pricing{grid-template-columns:1fr}
+  header{padding:0 16px;height:58px}
+  .logo{font-size:1rem}
+  .page{padding:28px 16px 60px}
+  .tool-section{padding:20px 14px}
+  .tool-tab{font-size:.73rem;padding:6px 14px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ImagePro</div>
+  <nav id="nav">
+    <a href="#" data-page="home">Home</a>
+    <a href="#" data-page="tools">Tools</a>
+    <a href="#" data-page="pricing">Pricing</a>
+  </nav>
+</header>
+
+<!-- Page: Home -->
+<section class="page active" id="page-home">
+  <div class="container">
+    <div class="hero">
+      <h1>Fix your images,<br>no signup required</h1>
+      <p>Compress, resize, crop, convert, remove backgrounds &amp; more — every tool runs right inside your browser. Your photos never leave your computer. Promise.</p>
+      <button class="btn btn-accent" id="heroCTA">Start Free &darr;</button>
+    </div>
+    <div class="features">
+      <div class="feature"><div class="icon">&#x1F4BE;</div><h3>Compress</h3><p>Squeeze any image under X KB — works like magic</p></div>
+      <div class="feature"><div class="icon">&#x2194;&#xFE0F;</div><h3>Resize &amp; Crop</h3><p>Change dimensions, chop the edges, keep the good stuff</p></div>
+      <div class="feature"><div class="icon">&#x1F504;</div><h3>Convert</h3><p>JPEG, PNG, WebP, GIF, BMP — whatever you need</p></div>
+      <div class="feature"><div class="icon">&#x2728;</div><h3>Filters &amp; Effects</h3><p>Blur, grayscale, sepia, brightness &amp; contrast tweaks</p></div>
+      <div class="feature"><div class="icon">&#x1F9F9;</div><h3>Remove BG</h3><p>Chroma key or smart edge detect — backgrounds gone</p></div>
+      <div class="feature"><div class="icon">&#x2122;&#xFE0F;</div><h3>Erase Watermark</h3><p>Blur out or patch over logos and text overlays</p></div>
+      <div class="feature"><div class="icon">&#x1F5BC;&#xFE0F;</div><h3>Merge Images</h3><p>Stack them side-by-side or vertically</p></div>
+      <div class="feature"><div class="icon">&#x23F9;&#xFE0F;</div><h3>Border &amp; Frame</h3><p>Colored borders, rounded corners, fancy frames</p></div>
+      <div class="feature"><div class="icon">&#x2728;</div><h3>Sharpen</h3><p>Make blurry photos crisp again</p></div>
+      <div class="feature"><div class="icon">&#x1F50D;</div><h3>Upscale</h3><p>Enlarge without turning into a pixel mess</p></div>
+      <div class="feature"><div class="icon">&#x1F4DD;</div><h3>Meme Maker</h3><p>Top text, bottom text, instant classic</p></div>
+      <div class="feature"><div class="icon">&#x2139;&#xFE0F;</div><h3>Image Info</h3><p>See metadata, color palette &amp; more geeky details</p></div>
+    </div>
+  </div>
+</section>
+<style>
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.card-processing { animation: pulse .8s ease-in-out infinite; }
+</style>
+
+<!-- Page: Pricing -->
+<section class="page" id="page-pricing">
+  <div class="container">
+    <div class="hero"><h1>Fair &amp; simple</h1><p>Everything works for free in your browser. The paid plan is for people who need the server-side API or faster batch processing.</p></div>
+    <div class="pricing">
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price">$0<span>/mo</span></div>
+        <ul>
+          <li>All 15 tools, fully client-side</li>
+          <li>No uploads, nothing leaves your computer</li>
+          <li>Every format under the sun</li>
+          <li>Privacy-first, zero tracking</li>
+        </ul>
+        <button class="btn btn-outline" id="freeCTA" style="width:100%">Start Free</button>
+      </div>
+      <div class="plan featured">
+        <div class="badge">Most Popular</div>
+        <h3>Premium</h3>
+        <div class="price">$9<span>/mo</span></div>
+        <ul>
+          <li>Server-side processing (up to 100/day)</li>
+          <li>API access with your own key</li>
+          <li>Advanced compression via sharp</li>
+          <li>Faster batch processing</li>
+          <li>Email support within 24h</li>
+        </ul>
+        <button class="btn btn-accent" id="premiumCTA" style="width:100%">Coming Soon</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Page: Tools -->
+<section class="page" id="page-tools">
+  <div class="container">
+    <div class="hero" style="padding:20px 0"><h1>Pick your tool</h1><p>Everything runs in your browser. Drop an image, tweak it, download it. That's it.</p></div>
+    <div id="dashArea"></div>
+
+    <!-- Tool tabs (scrollable on small screens) -->
+    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="tool-tab active" data-tool="compress">&#x1F4BE; Compress</button>
+      <button class="tool-tab" data-tool="resize">&#x2194;&#xFE0F; Resize</button>
+      <button class="tool-tab" data-tool="crop">&#x2702;&#xFE0F; Crop</button>
+      <button class="tool-tab" data-tool="convert">&#x1F504; Convert</button>
+      <button class="tool-tab" data-tool="rotate">&#x1F504;&#xFE0F; Rotate</button>
+      <button class="tool-tab" data-tool="filters">&#x1F3A8; Filters</button>
+      <button class="tool-tab" data-tool="border">&#x23F9;&#xFE0F; Border</button>
+      <button class="tool-tab" data-tool="watermark">&#x2122;&#xFE0F; Watermark</button>
+      <button class="tool-tab" data-tool="sharpen">&#x2728; Sharpen</button>
+      <button class="tool-tab" data-tool="upscale">&#x1F50D; Upscale</button>
+      <button class="tool-tab" data-tool="meme">&#x1F4DD; Meme</button>
+      <button class="tool-tab" data-tool="info">&#x2139;&#xFE0F; Info</button>
+      <button class="tool-tab" data-tool="merge">&#x1F5BC;&#xFE0F; Merge</button>
+      <button class="tool-tab" data-tool="removebg">&#x1F9F9; Remove BG</button>
+      <button class="tool-tab" data-tool="ocr">&#x1F4D6; OCR</button>
+    </div>
+
+    <div class="tool-section">
+      <!-- Dropzone (shared) -->
+      <div id="dropzone">
+        <div class="dz-icon">&#x1F4C2;</div>
+        <p style="font-size:1.1rem;font-weight:600;margin-bottom:4px;">Drop images or click to browse</p>
+        <p style="font-size:.82rem;color:var(--text2)">JPG, PNG, WebP, BMP, TIFF, GIF, AVIF, SVG, HEIC &amp; ZIP</p>
+        <input type="file" id="fileInput" multiple accept="image/*,.zip" style="display:none">
+      </div>
+      <div class="flex" style="margin-bottom:8px">
+        <span class="tool-label">&#x1F310; Import:</span>
+        <input type="text" id="urlInput" placeholder="Paste image URL..." style="flex:1;min-width:180px">
+        <button class="btn btn-accent btn-sm" id="urlLoadBtn">Load URL</button>
+        <button class="btn btn-outline btn-sm" id="gdriveBtn" title="Import from Google Drive">Google Drive</button>
+        <button class="btn btn-outline btn-sm" id="dropboxBtn" title="Import from Dropbox">Dropbox</button>
+      </div>
+
+      <!-- Compress -->
+      <div class="tool-panel" data-tool="compress">
+        <div class="flex">
+          <label class="tool-label">Target: <input type="number" id="cmpTarget" value="100" min="1" max="10000" style="width:70px"> KB</label>
+          <label class="tool-label flex gap-sm"><input type="checkbox" id="cmpKeepPng" checked> Keep PNG</label>
+        </div>
+      </div>
+
+      <!-- Resize -->
+      <div class="tool-panel" data-tool="resize" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Width: <input type="number" id="resW" value="800" min="1" max="10000" style="width:70px"> px</label>
+          <label class="tool-label">Height: <input type="number" id="resH" value="0" min="0" max="10000" style="width:70px"> px <span style="color:var(--text2);font-size:.75rem">(0 = auto)</span></label>
+          <label class="tool-label flex gap-sm"><input type="checkbox" id="resKeepRatio" checked> Keep ratio</label>
+        </div>
+      </div>
+
+      <!-- Crop -->
+      <div class="tool-panel" data-tool="crop" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Top: <input type="number" id="cropTop" value="0" min="0" style="width:60px"></label>
+          <label class="tool-label">Bottom: <input type="number" id="cropBottom" value="0" min="0" style="width:60px"></label>
+          <label class="tool-label">Left: <input type="number" id="cropLeft" value="0" min="0" style="width:60px"></label>
+          <label class="tool-label">Right: <input type="number" id="cropRight" value="0" min="0" style="width:60px"></label>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:.8rem;color:var(--text2)">Aspect ratio:</span>
+          <button class="btn btn-outline crop-ar" data-ar="free" style="padding:3px 12px;font-size:.75rem">Free</button>
+          <button class="btn btn-outline crop-ar" data-ar="1:1" style="padding:3px 12px;font-size:.75rem">1:1</button>
+          <button class="btn btn-outline crop-ar" data-ar="4:3" style="padding:3px 12px;font-size:.75rem">4:3</button>
+          <button class="btn btn-outline crop-ar" data-ar="16:9" style="padding:3px 12px;font-size:.75rem">16:9</button>
+          <button class="btn btn-outline crop-ar" data-ar="3:2" style="padding:3px 12px;font-size:.75rem">3:2</button>
+          <span id="cropInfo" style="font-size:.75rem;color:var(--text2)"></span>
+        </div>
+      </div>
+
+      <!-- Convert -->
+      <div class="tool-panel" data-tool="convert" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Output:
+            <select id="convFormat" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:var(--surface2);color:var(--text)">
+              <option value="jpeg">JPEG</option><option value="png">PNG</option><option value="webp">WebP</option><option value="gif">GIF</option><option value="bmp">BMP</option>
+            </select>
+          </label>
+          <label class="tool-label">Quality: <input type="number" id="convQuality" value="85" min="1" max="100" style="width:55px"></label>
+        </div>
+      </div>
+
+      <!-- Rotate -->
+      <div class="tool-panel" data-tool="rotate" style="display:none">
+        <div class="flex">
+          <label class="tool-label flex gap-sm"><input type="radio" name="rot" value="90" checked> 90&deg;</label>
+          <label class="tool-label flex gap-sm"><input type="radio" name="rot" value="-90"> -90&deg;</label>
+          <label class="tool-label flex gap-sm"><input type="radio" name="rot" value="180"> 180&deg;</label>
+          <label class="tool-label flex gap-sm"><input type="radio" name="rot" value="hflip"> Flip H</label>
+          <label class="tool-label flex gap-sm"><input type="radio" name="rot" value="vflip"> Flip V</label>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="tool-panel" data-tool="filters" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Grayscale: <input type="range" id="fltGray" min="0" max="100" value="0" style="width:80px" oninput="document.getElementById('fltGrayV').textContent=this.value+'%'"> <span id="fltGrayV">0%</span></label>
+          <label class="tool-label">Sepia: <input type="range" id="fltSepia" min="0" max="100" value="0" style="width:80px" oninput="document.getElementById('fltSepiaV').textContent=this.value+'%'"> <span id="fltSepiaV">0%</span></label>
+          <label class="tool-label">Blur: <input type="range" id="fltBlur" min="0" max="10" value="0" step="0.5" style="width:80px" oninput="document.getElementById('fltBlurV').textContent=this.value+'px'"> <span id="fltBlurV">0px</span></label>
+          <label class="tool-label">Brightness: <input type="range" id="fltBright" min="20" max="300" value="100" style="width:80px" oninput="document.getElementById('fltBrightV').textContent=this.value+'%'"> <span id="fltBrightV">100%</span></label>
+          <label class="tool-label">Contrast: <input type="range" id="fltContrast" min="20" max="300" value="100" style="width:80px" oninput="document.getElementById('fltContrastV').textContent=this.value+'%'"> <span id="fltContrastV">100%</span></label>
+          <label class="tool-label">Saturation: <input type="range" id="fltSat" min="0" max="300" value="100" style="width:80px" oninput="document.getElementById('fltSatV').textContent=this.value+'%'"> <span id="fltSatV">100%</span></label>
+        </div>
+      </div>
+
+      <!-- Border -->
+      <div class="tool-panel" data-tool="border" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Width: <input type="range" id="bdrWidth" min="1" max="50" value="10" style="width:100px" oninput="document.getElementById('bdrWidthV').textContent=this.value+'px'"> <span id="bdrWidthV">10px</span></label>
+          <label class="tool-label">Color: <input type="color" id="bdrColor" value="#6c5ce7" style="width:40px;height:30px;border:none;background:transparent;cursor:pointer"></label>
+          <label class="tool-label">Round: <input type="range" id="bdrRadius" min="0" max="50" value="0" style="width:80px" oninput="document.getElementById('bdrRadiusV').textContent=this.value+'px'"> <span id="bdrRadiusV">0px</span></label>
+        </div>
+      </div>
+
+      <!-- Remove Watermark -->
+      <div class="tool-panel" data-tool="watermark" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Method:
+            <select id="rwMethod" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:var(--surface2);color:var(--text)">
+              <option value="blur">Blur</option><option value="patch">Patch</option><option value="smart">Smart Fill</option>
+            </select>
+          </label>
+          <label class="tool-label">Region:
+            <select id="rwPos" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:var(--surface2);color:var(--text)">
+              <option value="tl">Top-Left</option><option value="tr">Top-Right</option><option value="bl">Bottom-Left</option><option value="br">Bottom-Right</option><option value="c">Center</option>
+            </select>
+          </label>
+          <label class="tool-label">Width: <input type="range" id="rwWidth" min="5" max="60" value="30" style="width:80px" oninput="document.getElementById('rwWidthV').textContent=this.value+'%'"> <span id="rwWidthV">30%</span></label>
+          <label class="tool-label">Height: <input type="range" id="rwHeight" min="5" max="60" value="15" style="width:80px" oninput="document.getElementById('rwHeightV').textContent=this.value+'%'"> <span id="rwHeightV">15%</span></label>
+          <label class="tool-label">Strength: <input type="range" id="rwStrength" min="1" max="10" value="5" style="width:80px" oninput="document.getElementById('rwStrengthV').textContent=this.value"> <span id="rwStrengthV">5</span></label>
+        </div>
+        <div style="margin-top:8px;font-size:.78rem;color:var(--text3);line-height:1.5">
+          &#x2139;&#xFE0F; Select the approximate position and size of the watermark. Smart Fill works best on uniform backgrounds. Blur removes text watermarks cleanly.
+        </div>
+      </div>
+
+      <!-- Sharpen -->
+      <div class="tool-panel" data-tool="sharpen" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Amount: <input type="range" id="shpAmount" min="0" max="200" value="50" style="width:100px" oninput="document.getElementById('shpAmountV').textContent=this.value+'%'"> <span id="shpAmountV">50%</span></label>
+          <label class="tool-label">Denoise: <input type="range" id="shpDenoise" min="0" max="5" value="0" step="1" style="width:80px" oninput="document.getElementById('shpDenoiseV').textContent=this.value"> <span id="shpDenoiseV">0</span></label>
+        </div>
+      </div>
+
+      <!-- Upscale / Enlarge -->
+      <div class="tool-panel" data-tool="upscale" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Scale:
+            <select id="upsScale" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:var(--surface2);color:var(--text)">
+              <option value="2">2x</option><option value="3">3x</option><option value="4">4x</option>
+            </select>
+          </label>
+          <label class="tool-label">Method:
+            <select id="upsMethod" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:var(--surface2);color:var(--text)">
+              <option value="smooth">Smooth</option><option value="sharp">Sharp</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <!-- Meme Generator -->
+      <div class="tool-panel" data-tool="meme" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Top text: <input type="text" id="memeTop" value="" placeholder="Top" style="width:150px"></label>
+          <label class="tool-label">Bottom: <input type="text" id="memeBottom" value="" placeholder="Bottom" style="width:150px"></label>
+          <label class="tool-label">Font size: <input type="number" id="memeSize" value="48" min="12" max="200" style="width:55px"></label>
+          <label class="tool-label">Color: <input type="color" id="memeColor" value="#ffffff" style="width:36px;height:28px;border:none;background:transparent;cursor:pointer"></label>
+        </div>
+      </div>
+
+      <!-- Image Info / Palette -->
+      <div class="tool-panel" data-tool="info" style="display:none">
+        <div id="infoPanel" style="font-size:.85rem;color:var(--text2);line-height:1.7">
+          Drop an image to see its info and color palette.
+        </div>
+      </div>
+
+      <!-- Merge -->
+      <div class="tool-panel" data-tool="merge" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Direction:
+            <select id="mrgDir" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:var(--surface2);color:var(--text)">
+              <option value="h">Horizontal</option><option value="v">Vertical</option>
+            </select>
+          </label>
+          <label class="tool-label">Spacing: <input type="number" id="mrgGap" value="4" min="0" max="100" style="width:55px"> px</label>
+          <span style="font-size:.8rem;color:var(--text2)">&#x2139;&#xFE0F; Upload multiple images to merge</span>
+        </div>
+      </div>
+
+      <!-- Remove BG -->
+      <div class="tool-panel" data-tool="removebg" style="display:none">
+        <div class="flex">
+          <label class="tool-label">Mode:
+            <select id="rgbMode" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:var(--surface2);color:var(--text)">
+              <option value="chroma">Chroma Key</option><option value="smart">Smart Edge Detect</option>
+            </select>
+          </label>
+          <label class="tool-label" id="rgbKeyLabel">Key color: <input type="color" id="rgbKey" value="#00ff00" style="width:40px;height:30px;border:none;background:transparent;cursor:pointer"></label>
+          <label class="tool-label">Tolerance: <input type="range" id="rgbTol" min="0" max="150" value="60" style="width:100px" oninput="document.getElementById('rgbTolV').textContent=this.value"> <span id="rgbTolV">60</span></label>
+          <span style="font-size:.8rem;color:var(--text2)">&#x2139;&#xFE0F; Chroma = solid color bg. Smart = edge-based detection</span>
+        </div>
+      </div>
+
+      <!-- OCR -->
+      <div class="tool-panel" data-tool="ocr" style="display:none">
+        <div class="flex" style="margin-bottom:8px;">
+          <label class="tool-label">Language:
+            <select id="ocrLang" style="padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:var(--surface2);color:var(--text)">
+              <option value="eng">English</option><option value="fra">French</option><option value="deu">German</option><option value="spa">Spanish</option><option value="ita">Italian</option><option value="por">Portuguese</option><option value="rus">Russian</option><option value="jpn">Japanese</option><option value="chi_sim">Chinese (Simplified)</option><option value="ara">Arabic</option>
+            </select>
+          </label>
+          <span id="ocrStatus" style="font-size:.8rem;color:var(--text2)">Extracts text from images</span>
+        </div>
+        <div id="ocrResult" style="display:none;background:var(--surface2);border-radius:8px;padding:12px;margin-top:8px;border:1px solid rgba(255,255,255,.06);">
+          <div style="font-size:.8rem;color:var(--text2);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+            <span>Extracted text:</span>
+            <button class="btn btn-accent btn-xs" id="ocrCopyBtn">Copy</button>
+          </div>
+          <pre id="ocrText" style="font-size:.82rem;color:var(--text);white-space:pre-wrap;word-break:break-word;margin:0;background:transparent;border:none;padding:0;max-height:300px;overflow-y:auto"></pre>
+        </div>
+      </div>
+
+      <!-- Batch actions -->
+      <div id="batchBar" style="margin-top:16px;display:none;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button class="btn btn-accent" id="downloadAllBtn">&#x1F4E5; Download All as ZIP (0)</button>
+        <button class="btn btn-outline" id="reprocessAllBtn">&#x1F504; Reprocess All</button>
+        <button class="btn btn-outline" id="applyAllBtn">&#x1F4CB; Apply to All</button>
+        <span style="font-size:.75rem;color:var(--text2)">&#x2139;&#xFE0F; Undo/Compare per card</span>
+      </div>
+
+      <div id="toolResults"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Compare Modal (before/after slider) -->
+<div class="modal-overlay" id="compareModal">
+  <div class="modal" style="max-width:90vw;width:auto;padding:16px">
+    <button class="modal-close" id="compareModalClose">&times;</button>
+    <div style="font-size:.85rem;color:var(--text2);margin-bottom:8px">&#x2190; Drag to compare &nbsp; <span id="compareLabel">Original vs Processed</span></div>
+    <div id="compareContainer" style="position:relative;max-width:100%;max-height:70vh;overflow:hidden;user-select:none;cursor:ew-resize;">
+      <img id="compareBefore" style="display:block;max-width:100%;max-height:70vh;width:100%;height:auto">
+      <div id="compareOverlay" style="position:absolute;top:0;left:0;width:50%;height:100%;overflow:hidden;border-right:3px solid #fff;">
+        <img id="compareAfter" style="display:block;max-width:100%;max-height:70vh;width:auto;height:100%;max-width:none">
+      </div>
+      <div id="compareHandle" style="position:absolute;top:0;left:50%;width:3px;height:100%;background:#fff;transform:translateX(-1.5px);pointer-events:none;">
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 2px 8px rgba(0,0,0,0.5);">&#x2194;</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ──────────────────────────────────────────────
+let activeTool = 'compress';
+let items = [];
+let idCounter = 0;
+
+// ─── Page navigation ────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', a.dataset.page === name));
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('[data-page]').forEach(el => {
+  el.addEventListener('click', e => { e.preventDefault(); showPage(el.dataset.page); });
+});
+document.getElementById('heroCTA').addEventListener('click', () => { showPage('tools'); });
+document.getElementById('freeCTA').addEventListener('click', () => { showPage('tools'); });
+document.getElementById('premiumCTA').addEventListener('click', () => {
+  toast('Premium coming soon — Stripe integration in Phase 2');
+});
+
+// ─── Tool tabs ───────────────────────────────────────────
+document.querySelectorAll('.tool-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tool-panel').forEach(p => p.style.display = 'none');
+    const panel = document.querySelector(`.tool-panel[data-tool="${tab.dataset.tool}"]`);
+    if (panel) panel.style.display = '';
+    activeTool = tab.dataset.tool;
+    document.getElementById('batchBar').style.display = (activeTool === 'merge') ? 'none' : (items.length > 0 ? 'block' : 'none');
+  });
+});
+
+// ─── Shared DOM refs ────────────────────────────────────
+const DZ = document.getElementById('dropzone');
+const FI = document.getElementById('fileInput');
+const GRID = document.getElementById('toolResults');
+const TOAST = document.getElementById('toast');
+
+DZ.addEventListener('click', () => FI.click());
+DZ.addEventListener('dragover', e => { e.preventDefault(); DZ.classList.add('dragover'); });
+DZ.addEventListener('dragleave', () => { DZ.classList.remove('dragover'); });
+DZ.addEventListener('drop', e => { e.preventDefault(); DZ.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+FI.addEventListener('change', () => { handleFiles(FI.files); FI.value = ''; });
+
+// IMAGE_EXT regex for broad format support
+const IMG_RE = /\.(jpg|jpeg|png|webp|bmp|tiff|tif|gif|avif|svg|ico|heic|heif|jfif)$/i;
+
+function handleFiles(files) {
+  const arr = Array.from(files);
+  const imgs = arr.filter(f => IMG_RE.test(f.name));
+  const zips = arr.filter(f => /\.zip$/i.test(f.name));
+  for (const f of imgs) addItem(f);
+  for (const z of zips) processZip(z);
+  if (!imgs.length && !zips.length) toast('No supported files');
+  document.getElementById('batchBar').style.display = (activeTool !== 'merge' && items.length > 0) ? 'block' : 'none';
+  document.getElementById('downloadAllBtn').textContent = `\u{1F4E5} Download All as ZIP (${items.length})`;
+}
+
+async function processZip(zipFile) {
+  try {
+    const JSZip = window.JSZip;
+    if (!JSZip) { toast('JSZip library not loaded'); return; }
+    const data = await zipFile.arrayBuffer();
+    const zip = await JSZip.loadAsync(data);
+    const entries = [];
+    zip.forEach((path, entry) => { if (IMG_RE.test(path) && !entry.dir) entries.push(entry); });
+    if (!entries.length) { toast('No images in zip'); return; }
+    for (const entry of entries) {
+      const blob = await entry.async('blob');
+      addItem(new File([blob], entry.name.replace(/^.*[/\\]/, ''), { type: blob.type }), zipFile.name);
+    }
+  } catch (e) { toast('Zip error: ' + e.message); }
+}
+
+function addItem(file, sourceZip) {
+  const id = ++idCounter;
+  const item = { id, file, name: file.name, status: 'pending', origSize: file.size, finalSize: null, origUrl: null, finalBlob: null, finalUrl: null, sourceZip: sourceZip || null, history: [] };
+  items.push(item);
+  renderCard(item);
+  // Queue for sequential processing
+  if (!addItem._queue) addItem._queue = [];
+  addItem._queue.push(item);
+  if (!addItem._running) processNextFromQueue();
+}
+function processNextFromQueue() {
+  const q = addItem._queue;
+  if (!q || !q.length) { addItem._running = false; return; }
+  addItem._running = true;
+  const item = q.shift();
+  requestIdleCallback(() => {
+    processItem(item);
+    setTimeout(() => processNextFromQueue(), 0);
+  }, { timeout: 200 });
+}
+
+function renderCard(item) {
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.dataset.id = item.id;
+  card.innerHTML = `
+    <div class="card-img-wrap"><img class="card-img" src="">
+      <div class="card-badges" style="display:none">
+        <span class="badge-orig" style="background:rgba(0,0,0,0.7);color:#8888aa;padding:2px 8px;border-radius:4px;font-size:.65rem"></span>
+        <span class="badge-new" style="background:rgba(0,200,0,0.7);color:#fff;padding:2px 8px;border-radius:4px;font-size:.65rem"></span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-name">${esc(item.name)}</div>
+      <div style="font-size:.75rem;color:var(--text2)"><span class="status">Queued...</span></div>
+      <div class="card-actions">
+        <button class="card-action-btn primary btn-dl" disabled>Download</button>
+        <button class="card-action-btn btn-cmp" disabled>Compare</button>
+        <button class="card-action-btn btn-und" disabled title="Undo">&#x21A9;</button>
+        <button class="card-action-btn danger btn-rm" title="Remove">&#x2716;</button>
+      </div>
+    </div>`;
+        <button class="btn-rm" style="padding:6px 8px;border-radius:6px;border:1px solid #3a3a50;background:transparent;color:var(--text2);cursor:pointer;font-size:.72rem" title="Remove">&#x2716;</button>
+      </div>
+    </div>`;
+  card.querySelector('.btn-dl').addEventListener('click', () => downloadOne(item));
+  card.querySelector('.btn-cmp').addEventListener('click', () => openCompare(item));
+  card.querySelector('.btn-und').addEventListener('click', () => undoItem(item));
+  card.querySelector('.btn-rm').addEventListener('click', () => { removeItem(item.id); });
+  GRID.appendChild(card);
+}
+
+function updateCard(item, status, text, finalUrl) {
+  const card = GRID.querySelector(`[data-id="${item.id}"]`);
+  if (!card) return;
+  if (finalUrl) card.querySelector('.card-img').src = finalUrl;
+  const st = card.querySelector('.status');
+  card.classList.toggle('card-processing', status === 'proc');
+  if (status === 'done') {
+    const kb = (item.finalSize / 1024).toFixed(1);
+    const ob = (item.origSize / 1024).toFixed(1);
+    const badges = card.querySelector('.card-badges');
+    badges.style.display = 'flex';
+    badges.querySelector('.badge-orig').textContent = ob + ' KB';
+    badges.querySelector('.badge-new').textContent = kb + ' KB';
+    if (item.origSize > 0) {
+      const saved = ((item.origSize - item.finalSize) / item.origSize * 100).toFixed(0);
+      st.innerHTML = `<span style="color:var(--success)">${kb} KB (saved ${saved}%)</span>`;
+    } else {
+      st.innerHTML = `<span style="color:var(--success)">${kb} KB</span>`;
+    }
+    card.querySelector('.btn-dl').disabled = false;
+    card.querySelector('.btn-cmp').disabled = false;
+    card.querySelector('.btn-und').disabled = !item.history || item.history.length === 0;
+  } else if (status === 'err') {
+    st.innerHTML = `<span style="color:#e17055">${esc(text)}</span>`;
+  } else {
+    st.textContent = text;
+    card.querySelector('.btn-dl').disabled = true;
+    card.querySelector('.btn-cmp').disabled = true;
+    card.querySelector('.btn-und').disabled = true;
+  }
+}
+
+// ─── Process dispatch ────────────────────────────────────
+async function processItem(item) {
+  updateCard(item, 'proc', 'Processing...');
+  try {
+    const img = await loadImage(item.file);
+    item.origUrl = URL.createObjectURL(item.file);
+
+    let result;
+    switch (activeTool) {
+      case 'compress':  result = await processCompress(item, img); break;
+      case 'resize':    result = await processResize(item, img); break;
+      case 'crop':      result = await processCrop(item, img); break;
+      case 'convert':   result = await processConvert(item, img); break;
+      case 'rotate':    result = await processRotate(item, img); break;
+      case 'filters':   result = await processFilters(item, img); break;
+      case 'border':    result = await processBorder(item, img); break;
+      case 'watermark': result = await processWatermark(item, img); break;
+      case 'sharpen':   result = await processSharpen(item, img); break;
+      case 'upscale':   result = await processUpscale(item, img); break;
+      case 'meme':      result = await processMeme(item, img); break;
+      case 'info':      result = await processInfo(item, img); break;
+      case 'merge':     result = await processMerge(item, img); break;
+      case 'removebg':  result = await processRemoveBg(item, img); break;
+      case 'ocr':       result = await processOcr(item, img); break;
+      default:          result = await processCompress(item, img);
+    }
+
+    item.finalBlob = result.blob;
+    item.finalSize = result.blob.size;
+    if (item.finalUrl && item.history) item.history.push({ blob: item.finalBlob, url: item.finalUrl });
+    if (item.history && item.history.length > 20) item.history.shift();
+    item.finalUrl = result.dataUrl;
+    updateCard(item, 'done', '', item.finalUrl);
+  } catch (e) {
+    updateCard(item, 'err', e.message);
+  }
+}
+
+// ─── Tool: Compress ──────────────────────────────────────
+async function processCompress(item, img) {
+  const targetBytes = (parseInt(document.getElementById('cmpTarget').value) || 100) * 1024;
+  const keepPng = document.getElementById('cmpKeepPng').checked;
+  const ext = item.file.name.split('.').pop().toLowerCase();
+  const w = img.naturalWidth, h = img.naturalHeight;
+  if (item.file.size <= targetBytes) {
+    return { blob: item.file, dataUrl: URL.createObjectURL(item.file) };
+  }
+  const hasAlpha = checkAlphaSmall(img);
+  const SUPPORTS_WEBP = document.createElement('canvas').toDataURL('image/webp').startsWith('data:image/webp');
+
+  const c = document.createElement('canvas');
+  const ctx = c.getContext('2d');
+  const needAlpha = hasAlpha || keepPng || ext === 'png';
+
+  const strategies = [];
+  if (needAlpha) {
+    strategies.push({fmt:'png', mime:'image/png', scales:[1,0.7,0.5]});
+  } else {
+    strategies.push({fmt:'jpeg', mime:'image/jpeg', scales:[1,0.8,0.6,0.4]});
+  }
+  if (SUPPORTS_WEBP && !needAlpha) {
+    strategies.push({fmt:'webp', mime:'image/webp', scales:[1,0.8,0.6,0.4]});
+  }
+
+  for (const strat of strategies) {
+    for (const scale of strat.scales) {
+      const sw = Math.round(w * scale), sh = Math.round(h * scale);
+      if (sw < 24 || sh < 24) continue;
+      c.width = sw; c.height = sh;
+      if (strat.fmt === 'jpeg') { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,sw,sh); }
+      ctx.drawImage(img, 0, 0, sw, sh);
+
+      // Quick try at quality 50
+      const quickBlob = await blobFromCanvas(c, strat.mime, 50);
+      if (quickBlob && quickBlob.size <= targetBytes && quickBlob.size > 100) {
+        return { blob: quickBlob, dataUrl: URL.createObjectURL(quickBlob) };
+      }
+
+      // Binary search (5 iterations, quality 10-90)
+      let lo = 10, hi = 90, bestQ = 10, bestBlob = quickBlob;
+      for (let iter = 0; iter < 5; iter++) {
+        const mid = Math.floor((lo + hi) / 2);
+        const blob = await blobFromCanvas(c, strat.mime, mid);
+        if (!blob || blob.size <= 0) { hi = mid - 1; continue; }
+        if (blob.size <= targetBytes) { bestQ = mid; bestBlob = blob; lo = mid + 1; }
+        else { hi = mid - 1; }
+      }
+      if (bestBlob && bestBlob.size <= targetBytes && bestBlob.size > 100) {
+        return { blob: bestBlob, dataUrl: URL.createObjectURL(bestBlob) };
+      }
+    }
+  }
+
+  // Last resort: aggressive scale down
+  for (let scale = 0.3; scale >= 0.1; scale -= 0.05) {
+    const sw = Math.max(16, Math.round(w * scale)), sh = Math.max(16, Math.round(h * scale));
+    c.width = sw; c.height = sh;
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,sw,sh);
+    ctx.drawImage(img, 0, 0, sw, sh);
+    const blob = await blobFromCanvas(c, 'image/jpeg', 40);
+    if (blob && blob.size > 100) return { blob, dataUrl: URL.createObjectURL(blob) };
+  }
+
+  return { blob: item.file, dataUrl: URL.createObjectURL(item.file) };
+}
+    if (blob && blob.size <= targetBytes) return {blob,dataUrl:URL.createObjectURL(blob)};
+  }
+  const c = document.createElement('canvas'); c.width=16; c.height=16;
+  const ctx = c.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,16,16); ctx.drawImage(img,0,0,16,16);
+  const blob = await blobFromCanvas(c, 'image/jpeg', 30);
+  return {blob,dataUrl:URL.createObjectURL(blob)};
+}
+
+// ─── Tool: Resize ────────────────────────────────────────
+async function processResize(item, img) {
+  let targetW = parseInt(document.getElementById('resW').value) || 800;
+  let targetH = parseInt(document.getElementById('resH').value) || 0;
+  const keepRatio = document.getElementById('resKeepRatio').checked;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+
+  if (keepRatio) {
+    if (targetW && targetH) {
+      const ar = iw / ih;
+      if (targetW / targetH > ar) targetW = Math.round(targetH * ar);
+      else targetH = Math.round(targetW / ar);
+    } else if (targetW) {
+      targetH = Math.round(targetW / iw * ih);
+    } else if (targetH) {
+      targetW = Math.round(targetH / ih * iw);
+    }
+  }
+  targetW = Math.max(1, targetW); targetH = Math.max(1, targetH);
+  const c = document.createElement('canvas');
+  c.width = targetW; c.height = targetH;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0, targetW, targetH);
+  const ext = item.file.name.split('.').pop().toLowerCase();
+  const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
+  const blob = await blobFromCanvas(c, mime, 92);
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Crop ──────────────────────────────────────────
+async function processCrop(item, img) {
+  const t = parseInt(document.getElementById('cropTop').value) || 0;
+  const b = parseInt(document.getElementById('cropBottom').value) || 0;
+  const l = parseInt(document.getElementById('cropLeft').value) || 0;
+  const r = parseInt(document.getElementById('cropRight').value) || 0;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+
+  let x = l, y = t, cw = Math.max(1, iw - l - r), ch = Math.max(1, ih - t - b);
+
+  // Apply aspect ratio if set
+  const arBtn = document.querySelector('.crop-ar.active');
+  if (arBtn && arBtn.dataset.ar !== 'free') {
+    const parts = arBtn.dataset.ar.split(':');
+    const arW = parseFloat(parts[0]), arH = parseFloat(parts[1]);
+    const targetAr = arW / arH;
+    if (cw / ch > targetAr) { cw = Math.round(ch * targetAr); } else { ch = Math.round(cw / targetAr); }
+  }
+
+  const c = document.createElement('canvas');
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, x, y, cw, ch, 0, 0, cw, ch);
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Convert ──────────────────────────────────────
+async function processConvert(item, img) {
+  const fmt = document.getElementById('convFormat').value;
+  const quality = parseInt(document.getElementById('convQuality').value) || 85;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const c = document.createElement('canvas');
+  c.width = iw; c.height = ih;
+  const ctx = c.getContext('2d');
+  if (fmt === 'jpeg') { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,iw,ih); }
+  ctx.drawImage(img, 0, 0);
+  const mimeMap = { jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif', bmp: 'image/bmp' };
+  const mime = mimeMap[fmt] || 'image/png';
+  const blob = await blobFromCanvas(c, mime, quality);
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Rotate/Flip ───────────────────────────────────
+async function processRotate(item, img) {
+  const val = document.querySelector('input[name="rot"]:checked');
+  if (!val) throw new Error('Select a rotation');
+  const mode = val.value;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  let cw, ch, deg = 0, sx=1, sy=1;
+  if (mode === '90') { cw=ih; ch=iw; deg=90; }
+  else if (mode === '-90') { cw=ih; ch=iw; deg=-90; }
+  else if (mode === '180') { cw=iw; ch=ih; deg=180; }
+  else if (mode === 'hflip') { cw=iw; ch=ih; sx=-1; }
+  else if (mode === 'vflip') { cw=iw; ch=ih; sy=-1; }
+  const c = document.createElement('canvas');
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+  if (deg) {
+    ctx.translate(cw/2, ch/2);
+    ctx.rotate(deg * Math.PI / 180);
+    ctx.drawImage(img, -iw/2, -ih/2);
+  } else {
+    ctx.translate(sx === -1 ? cw : 0, sy === -1 ? ch : 0);
+    ctx.scale(sx, sy);
+    ctx.drawImage(img, 0, 0);
+  }
+  const ext = item.file.name.split('.').pop().toLowerCase();
+  const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
+  const blob = await blobFromCanvas(c, mime, 92);
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Filters ───────────────────────────────────────
+async function processFilters(item, img) {
+  const gray = (parseInt(document.getElementById('fltGray').value) || 0) / 100;
+  const sepia = (parseInt(document.getElementById('fltSepia').value) || 0) / 100;
+  const blur = parseFloat(document.getElementById('fltBlur').value) || 0;
+  const bright = (parseInt(document.getElementById('fltBright').value) || 100) / 100;
+  const contrast = (parseInt(document.getElementById('fltContrast').value) || 100) / 100;
+  const sat = (parseInt(document.getElementById('fltSat').value) || 100) / 100;
+
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const c = document.createElement('canvas');
+  c.width = iw; c.height = ih;
+  const ctx = c.getContext('2d');
+
+  // Build CSS filter string
+  const filters = [];
+  if (gray) filters.push(`grayscale(${gray})`);
+  if (sepia) filters.push(`sepia(${sepia})`);
+  if (blur) filters.push(`blur(${blur}px)`);
+  if (bright !== 1) filters.push(`brightness(${bright})`);
+  if (contrast !== 1) filters.push(`contrast(${contrast})`);
+  if (sat !== 1) filters.push(`saturate(${sat})`);
+
+  if (filters.length) ctx.filter = filters.join(' ');
+  ctx.drawImage(img, 0, 0);
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Border ────────────────────────────────────────
+async function processBorder(item, img) {
+  const bw = parseInt(document.getElementById('bdrWidth').value) || 10;
+  const color = document.getElementById('bdrColor').value || '#6c5ce7';
+  const radius = parseInt(document.getElementById('bdrRadius').value) || 0;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const cw = iw + bw * 2, ch = ih + bw * 2;
+  const c = document.createElement('canvas');
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, cw, ch);
+  if (radius > 0) {
+    ctx.beginPath();
+    ctx.moveTo(bw + radius, bw);
+    ctx.lineTo(bw + iw - radius, bw);
+    ctx.quadraticCurveTo(bw + iw, bw, bw + iw, bw + radius);
+    ctx.lineTo(bw + iw, bw + ih - radius);
+    ctx.quadraticCurveTo(bw + iw, bw + ih, bw + iw - radius, bw + ih);
+    ctx.lineTo(bw + radius, bw + ih);
+    ctx.quadraticCurveTo(bw, bw + ih, bw, bw + ih - radius);
+    ctx.lineTo(bw, bw + radius);
+    ctx.quadraticCurveTo(bw, bw, bw + radius, bw);
+    ctx.closePath();
+    ctx.clip();
+  }
+  ctx.drawImage(img, bw, bw);
+  // Draw rounded overlay if radius
+  if (radius > 0) {
+    ctx.restore();
+  }
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Watermark ─────────────────────────────────────
+async function processWatermark(item, img) {
+  const method = document.getElementById('rwMethod').value;
+  const pos = document.getElementById('rwPos').value;
+  const wp = (parseInt(document.getElementById('rwWidth').value) || 30) / 100;
+  const hp = (parseInt(document.getElementById('rwHeight').value) || 15) / 100;
+  const strength = parseInt(document.getElementById('rwStrength').value) || 5;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const rw = Math.round(iw * wp), rh = Math.round(ih * hp);
+  let rx, ry;
+  const pad = Math.round(Math.min(iw, ih) * 0.02);
+  switch (pos) {
+    case 'tl': rx = pad; ry = pad; break;
+    case 'tr': rx = iw - rw - pad; ry = pad; break;
+    case 'bl': rx = pad; ry = ih - rh - pad; break;
+    case 'br': rx = iw - rw - pad; ry = ih - rh - pad; break;
+    case 'c':  rx = Math.round((iw - rw) / 2); ry = Math.round((ih - rh) / 2); break;
+    default:   rx = iw - rw - pad; ry = pad;
+  }
+  rx = Math.max(0, Math.min(rx, iw - 1));
+  ry = Math.max(0, Math.min(ry, ih - 1));
+
+  const c = document.createElement('canvas');
+  c.width = iw; c.height = ih;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, iw, ih);
+  const data = imageData.data;
+
+  if (method === 'blur') {
+    applyBoxBlur(data, iw, ih, rx, ry, rw, rh, strength);
+  } else if (method === 'patch') {
+    patchWatermark(data, iw, ih, rx, ry, rw, rh, strength);
+  } else {
+    smartFill(data, iw, ih, rx, ry, rw, rh, strength);
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// Box blur (multi-pass) over a rectangular region
+function applyBoxBlur(data, w, h, rx, ry, rw, rh, passes) {
+  const copy = new Uint8ClampedArray(data);
+  for (let p = 0; p < passes; p++) {
+    for (let y = ry; y < ry + rh; y++) {
+      for (let x = rx; x < rx + rw; x++) {
+        let tr = 0, tg = 0, tb = 0, count = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const cx = x + dx, cy = y + dy;
+            if (cx >= 0 && cx < w && cy >= 0 && cy < h) {
+              const ci = (cy * w + cx) * 4;
+              tr += copy[ci]; tg += copy[ci + 1]; tb += copy[ci + 2]; count++;
+            }
+          }
+        }
+        const i = (y * w + x) * 4;
+        data[i] = tr / count; data[i + 1] = tg / count; data[i + 2] = tb / count;
+      }
+    }
+    if (p < passes - 1) copy.set(data);
+  }
+}
+
+// Patch: replace watermark region with surrounding pixels
+function patchWatermark(data, w, h, rx, ry, rw, rh, strength) {
+  const src = new Uint8ClampedArray(data);
+  for (let y = ry; y < ry + rh; y++) {
+    for (let x = rx; x < rx + rw; x++) {
+      // Find nearest pixel outside the region (same row first)
+      let leftX = -1, rightX = -1;
+      for (let cx = x - 1; cx >= 0; cx--) { if (cx < rx) { leftX = cx; break; } }
+      for (let cx = x + 1; cx < w; cx++) { if (cx >= rx + rw) { rightX = cx; break; } }
+      let bestSx = -1, bestSy = -1;
+      if (leftX >= 0) { bestSx = leftX; bestSy = y; }
+      else if (rightX >= 0) { bestSx = rightX; bestSy = y; }
+      else {
+        for (let cy = y - 1; cy >= 0; cy--) { if (cy < ry) { bestSx = x; bestSy = cy; break; } }
+        if (bestSx < 0) for (let cy = y + 1; cy < h; cy++) { if (cy >= ry + rh) { bestSx = x; bestSy = cy; break; } }
+      }
+      if (bestSx < 0) continue;
+      const si = (bestSy * w + bestSx) * 4;
+      const di = (y * w + x) * 4;
+      const dist = Math.abs(x - bestSx) + Math.abs(y - bestSy);
+      const blend = Math.min(1, strength / (dist + strength));
+      data[di] = data[di] * (1 - blend) + src[si] * blend;
+      data[di + 1] = data[di + 1] * (1 - blend) + src[si + 1] * blend;
+      data[di + 2] = data[di + 2] * (1 - blend) + src[si + 2] * blend;
+    }
+  }
+}
+
+// Smart fill: median color from border blended inward
+function smartFill(data, w, h, rx, ry, rw, rh, strength) {
+  const border = 8;
+  const sr = [], sg = [], sb = [];
+  const x1 = Math.max(0, rx - border), y1 = Math.max(0, ry - border);
+  const x2 = Math.min(w - 1, rx + rw + border), y2 = Math.min(h - 1, ry + rh + border);
+  for (let y = y1; y <= y2; y++) {
+    for (let x = x1; x <= x2; x++) {
+      if (x >= rx && x < rx + rw && y >= ry && y < ry + rh) continue;
+      const i = (y * w + x) * 4;
+      sr.push(data[i]); sg.push(data[i + 1]); sb.push(data[i + 2]);
+    }
+  }
+  if (!sr.length) return;
+  sr.sort((a, b) => a - b); sg.sort((a, b) => a - b); sb.sort((a, b) => a - b);
+  const mr = sr[Math.floor(sr.length / 2)] || 0;
+  const mg = sg[Math.floor(sg.length / 2)] || 0;
+  const mb = sb[Math.floor(sb.length / 2)] || 0;
+  for (let y = ry; y < ry + rh; y++) {
+    for (let x = rx; x < rx + rw; x++) {
+      const i = (y * w + x) * 4;
+      const dxb = Math.min(x - rx, rx + rw - 1 - x);
+      const dyb = Math.min(y - ry, ry + rh - 1 - y);
+      const dist = Math.min(dxb, dyb);
+      const blend = Math.min(1, (dist + 1) / (strength + 1));
+      data[i] = data[i] * (1 - blend) + mr * blend;
+      data[i + 1] = data[i + 1] * (1 - blend) + mg * blend;
+      data[i + 2] = data[i + 2] * (1 - blend) + mb * blend;
+    }
+  }
+}
+
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Merge ─────────────────────────────────────────
+async function processMerge(item, img) {
+  // Collect all loaded images for merging
+  const loaded = await Promise.all(items.filter(i => i !== item).map(async i => {
+    try { return { img: await loadImage(i.file), item: i }; } catch { return null; }
+  }));
+  const all = [{ img, item }, ...loaded.filter(Boolean)];
+
+  const dir = document.getElementById('mrgDir').value;
+  const gap = parseInt(document.getElementById('mrgGap').value) || 4;
+
+  let cw, ch;
+  if (dir === 'h') {
+    cw = all.reduce((s, x) => s + x.img.naturalWidth, 0) + gap * (all.length - 1);
+    ch = Math.max(...all.map(x => x.img.naturalHeight));
+  } else {
+    cw = Math.max(...all.map(x => x.img.naturalWidth));
+    ch = all.reduce((s, x) => s + x.img.naturalHeight, 0) + gap * (all.length - 1);
+  }
+
+  const c = document.createElement('canvas');
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+  let ox = 0, oy = 0;
+  for (const x of all) {
+    ctx.drawImage(x.img, ox, oy);
+    if (dir === 'h') ox += x.img.naturalWidth + gap;
+    else oy += x.img.naturalHeight + gap;
+  }
+
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Remove BG ────────────────────────────────────
+async function processRemoveBg(item, img) {
+  const mode = document.getElementById('rgbMode').value;
+  const tolerance = parseInt(document.getElementById('rgbTol').value) || 60;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const c = document.createElement('canvas');
+  c.width = iw; c.height = ih;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, iw, ih);
+  const data = imageData.data;
+
+  if (mode === 'chroma') {
+    const keyHex = document.getElementById('rgbKey').value || '#00ff00';
+    const r = parseInt(keyHex.slice(1,3), 16);
+    const g = parseInt(keyHex.slice(3,5), 16);
+    const b = parseInt(keyHex.slice(5,7), 16);
+    const tol2 = tolerance * tolerance;
+    for (let i = 0; i < data.length; i += 4) {
+      const dr = data[i] - r, dg = data[i+1] - g, db = data[i+2] - b;
+      if (dr*dr + dg*dg + db*db <= tol2) data[i+3] = 0;
+    }
+  } else {
+    // Smart Edge Detect mode: Sobel + flood fill from edges
+    const gray = new Uint8Array(iw * ih);
+    for (let y = 0; y < ih; y++) {
+      for (let x = 0; x < iw; x++) {
+        const idx = (y * iw + x) * 4;
+        gray[y * iw + x] = Math.round(data[idx] * 0.3 + data[idx+1] * 0.59 + data[idx+2] * 0.11);
+      }
+    }
+
+    // Sobel operator
+    const edges = new Uint8Array(iw * ih);
+    const t = Math.max(1, tolerance);
+    for (let y = 1; y < ih - 1; y++) {
+      for (let x = 1; x < iw - 1; x++) {
+        const gx = -gray[(y-1)*iw + x-1] + gray[(y-1)*iw + x+1]
+                  -2*gray[y*iw + x-1] + 2*gray[y*iw + x+1]
+                  -gray[(y+1)*iw + x-1] + gray[(y+1)*iw + x+1];
+        const gy = -gray[(y-1)*iw + x-1] -2*gray[(y-1)*iw + x] - gray[(y-1)*iw + x+1]
+                  + gray[(y+1)*iw + x-1] + 2*gray[(y+1)*iw + x] + gray[(y+1)*iw + x+1];
+        const mag = Math.round(Math.sqrt(gx*gx + gy*gy));
+        edges[y * iw + x] = mag > t ? 255 : 0;
+      }
+    }
+
+    // Dilate edges slightly
+    const dilated = new Uint8Array(edges);
+    for (let y = 2; y < ih - 2; y++) {
+      for (let x = 2; x < iw - 2; x++) {
+        if (edges[y * iw + x] === 255) {
+          for (let dy = -1; dy <= 1; dy++)
+            for (let dx = -1; dx <= 1; dx++)
+              dilated[(y + dy) * iw + (x + dx)] = 255;
+        }
+      }
+    }
+
+    // Flood fill from canvas edges (background)
+    const visited = new Uint8Array(iw * ih);
+    const stack = [];
+    // Push all edge pixels
+    for (let x = 0; x < iw; x++) {
+      stack.push(x, (ih-1)*iw + x);
+    }
+    for (let y = 0; y < ih; y++) {
+      stack.push(y * iw, y * iw + iw - 1);
+    }
+    while (stack.length) {
+      const pos = stack.pop();
+      if (pos < 0 || pos >= iw * ih || visited[pos] || dilated[pos] === 255) continue;
+      visited[pos] = 1;
+      const x = pos % iw, y = Math.floor(pos / iw);
+      if (x > 0) stack.push(pos - 1);
+      if (x < iw - 1) stack.push(pos + 1);
+      if (y > 0) stack.push(pos - iw);
+      if (y < ih - 1) stack.push(pos + iw);
+    }
+
+    // Set background pixels to transparent
+    for (let i = 0; i < visited.length; i++) {
+      if (visited[i]) data[i * 4 + 3] = 0;
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Sharpen ───────────────────────────────────────
+async function processSharpen(item, img) {
+  const amount = (parseInt(document.getElementById('shpAmount').value) || 50) / 100;
+  const denoise = parseInt(document.getElementById('shpDenoise').value) || 0;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const c = document.createElement('canvas');
+  c.width = iw; c.height = ih;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, iw, ih);
+  const data = imageData.data;
+  const w = iw, h = ih;
+
+  // Denoise (median filter)
+  if (denoise > 0) {
+    const radius = denoise;
+    const copy = new Uint8ClampedArray(data);
+    for (let y = radius; y < h - radius; y++) {
+      for (let x = radius; x < w - radius; x++) {
+        const r = [], g = [], b = [];
+        for (let dy = -radius; dy <= radius; dy++) {
+          for (let dx = -radius; dx <= radius; dx++) {
+            const idx = ((y + dy) * w + (x + dx)) * 4;
+            r.push(copy[idx]); g.push(copy[idx+1]); b.push(copy[idx+2]);
+          }
+        }
+        r.sort((a,b)=>a-b); g.sort((a,b)=>a-b); b.sort((a,b)=>a-b);
+        const mid = Math.floor(r.length / 2);
+        const idx = (y * w + x) * 4;
+        data[idx] = r[mid]; data[idx+1] = g[mid]; data[idx+2] = b[mid];
+      }
+    }
+  }
+
+  // Sharpen (unsharp mask via convolution)
+  if (amount > 0) {
+    const strength = amount * 2;
+    const kernel = [
+      0, -strength/4, 0,
+      -strength/4, 1 + strength, -strength/4,
+      0, -strength/4, 0
+    ];
+    const copy = new Uint8ClampedArray(data);
+    for (let y = 1; y < h - 1; y++) {
+      for (let x = 1; x < w - 1; x++) {
+        let r = 0, g = 0, b = 0;
+        for (let ky = -1; ky <= 1; ky++) {
+          for (let kx = -1; kx <= 1; kx++) {
+            const idx = ((y + ky) * w + (x + kx)) * 4;
+            const k = kernel[(ky + 1) * 3 + (kx + 1)];
+            r += copy[idx] * k; g += copy[idx+1] * k; b += copy[idx+2] * k;
+          }
+        }
+        const idx = (y * w + x) * 4;
+        data[idx] = Math.max(0, Math.min(255, r));
+        data[idx+1] = Math.max(0, Math.min(255, g));
+        data[idx+2] = Math.max(0, Math.min(255, b));
+      }
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Upscale ───────────────────────────────────────
+async function processUpscale(item, img) {
+  const scale = parseInt(document.getElementById('upsScale').value) || 2;
+  const method = document.getElementById('upsMethod').value;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const cw = iw * scale, ch = ih * scale;
+  const c = document.createElement('canvas');
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+
+  // Multi-step upscale for better quality (step by 2x)
+  let steps = [];
+  let s = scale;
+  while (s > 1) { steps.push(Math.min(2, s)); s -= 2; }
+  if (!steps.length) steps.push(scale);
+
+  if (method === 'smooth') {
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, cw, ch);
+  } else {
+    // Step upscale with sharpen in between
+    ctx.imageSmoothingQuality = 'high';
+    let tempImg = img;
+    for (const step of steps) {
+      const tw = tempImg.naturalWidth * step, th = tempImg.naturalHeight * step;
+      const tc = document.createElement('canvas');
+      tc.width = tw; tc.height = th;
+      const tctx = tc.getContext('2d');
+      tctx.imageSmoothingQuality = 'high';
+      tctx.drawImage(tempImg, 0, 0, tw, th);
+      // Light sharpen after each step
+      const imageData = tctx.getImageData(0, 0, tw, th);
+      const data = imageData.data;
+      const w = tw, h = th;
+      const kernel = [0, -0.25, 0, -0.25, 1.5, -0.25, 0, -0.25, 0];
+      const copy = new Uint8ClampedArray(data);
+      for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+          let r = 0, g = 0, b = 0;
+          for (let ky = -1; ky <= 1; ky++) {
+            for (let kx = -1; kx <= 1; kx++) {
+              const idx = ((y + ky) * w + (x + kx)) * 4;
+              const k = kernel[(ky + 1) * 3 + (kx + 1)];
+              r += copy[idx] * k; g += copy[idx+1] * k; b += copy[idx+2] * k;
+            }
+          }
+          const idx = (y * w + x) * 4;
+          data[idx] = Math.max(0, Math.min(255, r));
+          data[idx+1] = Math.max(0, Math.min(255, g));
+          data[idx+2] = Math.max(0, Math.min(255, b));
+        }
+      }
+      tctx.putImageData(imageData, 0, 0);
+      tempImg = await canvasToImg(tc);
+    }
+    ctx.drawImage(tempImg, 0, 0);
+  }
+
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+function canvasToImg(canvas) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = canvas.toDataURL('image/png');
+  });
+}
+
+// ─── Tool: Meme Generator ────────────────────────────────
+async function processMeme(item, img) {
+  const topText = document.getElementById('memeTop').value || '';
+  const bottomText = document.getElementById('memeBottom').value || '';
+  const fontSize = parseInt(document.getElementById('memeSize').value) || 48;
+  const color = document.getElementById('memeColor').value || '#ffffff';
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const c = document.createElement('canvas');
+  c.width = iw; c.height = ih;
+  const ctx = c.getContext('2d');
+
+  // Draw image with dark top/bottom bands for text
+  ctx.drawImage(img, 0, 0);
+
+  const drawMemeText = (text, yPos) => {
+    if (!text) return;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `bold ${fontSize}px Impact, Arial Black, sans-serif`;
+
+    // Outline
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = Math.max(3, fontSize / 12);
+    ctx.lineJoin = 'round';
+    ctx.strokeText(text, iw / 2, yPos);
+
+    // Fill
+    ctx.fillStyle = color;
+    ctx.fillText(text, iw / 2, yPos);
+  };
+
+  // Add semi-transparent bars at top and bottom for readability
+  if (topText) {
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillRect(0, 0, iw, fontSize * 1.4);
+    drawMemeText(topText, fontSize * 0.7);
+  }
+  if (bottomText) {
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillRect(0, ih - fontSize * 1.4, iw, fontSize * 1.4);
+    drawMemeText(bottomText, ih - fontSize * 0.7);
+  }
+
+  const blob = await blobFromCanvas(c, 'image/png');
+  return { blob, dataUrl: URL.createObjectURL(blob) };
+}
+
+// ─── Tool: Image Info & Palette ──────────────────────────
+async function processInfo(item, img) {
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const c = document.createElement('canvas');
+  c.width = iw; c.height = ih;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, iw, ih);
+  const data = imageData.data;
+
+  // Extract color palette (dominant colors via bucket quantization)
+  const colorMap = {};
+  const step = 4; // sample every 4th pixel for speed
+  for (let i = 0; i < data.length; i += step * 4) {
+    const r = Math.round(data[i] / 32) * 32;
+    const g = Math.round(data[i+1] / 32) * 32;
+    const b = Math.round(data[i+2] / 32) * 32;
+    const key = r + ',' + g + ',' + b;
+    colorMap[key] = (colorMap[key] || 0) + 1;
+  }
+  const sorted = Object.entries(colorMap).sort((a, b) => b[1] - a[1]);
+  const topColors = sorted.slice(0, 8).map(e => {
+    const [r, g, b] = e[0].split(',').map(Number);
+    const hex = '#' + [r,g,b].map(v => v.toString(16).padStart(2, '0')).join('');
+    return { hex, count: e[1] };
+  });
+
+  // Build info display
+  const fileSize = item.file.size;
+  const sizeStr = fileSize > 1048576 ? (fileSize / 1048576).toFixed(1) + ' MB' : (fileSize / 1024).toFixed(1) + ' KB';
+  const paletteHtml = topColors.map(c =>
+    `<span style="display:inline-block;width:28px;height:28px;border-radius:4px;background:${c.hex};border:1px solid #3a3a50;margin:2px;vertical-align:middle" title="${c.hex}"></span>`
+  ).join('');
+  const hexCodes = topColors.map(c => c.hex).join(', ');
+
+  // Show info panel instead of card
+  const infoDiv = document.getElementById('infoPanel');
+  infoDiv.innerHTML = `
+    <table style="width:100%;border-collapse:collapse">
+      <tr><td style="padding:4px 12px 4px 0;font-weight:600;color:var(--text)">Name</td><td>${esc(item.name)}</td></tr>
+      <tr><td style="padding:4px 12px 4px 0;font-weight:600;color:var(--text)">Dimensions</td><td>${iw} x ${ih} px</td></tr>
+      <tr><td style="padding:4px 12px 4px 0;font-weight:600;color:var(--text)">Aspect Ratio</td><td>${(iw / ih).toFixed(2)}</td></tr>
+      <tr><td style="padding:4px 12px 4px 0;font-weight:600;color:var(--text)">File Size</td><td>${sizeStr}</td></tr>
+      <tr><td style="padding:4px 12px 4px 0;font-weight:600;color:var(--text)">Megapixels</td><td>${((iw * ih) / 1000000).toFixed(2)} MP</td></tr>
+      <tr><td style="padding:4px 12px 4px 0;font-weight:600;color:var(--text)">Color Palette</td><td>${paletteHtml}</td></tr>
+      <tr><td style="padding:4px 12px 4px 0;font-weight:600;color:var(--text)">Hex Codes</td><td style="font-size:.75rem;word-break:break-all">${hexCodes}</td></tr>
+    </table>
+  `;
+
+  // Return original blob as-is (no processing needed)
+  return { blob: item.file, dataUrl: URL.createObjectURL(item.file) };
+}
+
+// ─── Tool: OCR (Image to Text) ──────────────────────────
+const OCR_STATUS = document.getElementById('ocrStatus');
+const OCR_RESULT = document.getElementById('ocrResult');
+const OCR_TEXT = document.getElementById('ocrText');
+
+document.getElementById('ocrCopyBtn').addEventListener('click', () => {
+  const text = OCR_TEXT.textContent;
+  if (text) { navigator.clipboard.writeText(text).then(() => toast('Copied!')).catch(() => {}); }
+});
+
+async function processOcr(item, img) {
+  OCR_RESULT.style.display = 'none';
+  OCR_STATUS.textContent = 'Loading Tesseract.js...';
+  if (typeof Tesseract === 'undefined') await loadTesseract();
+  const lang = document.getElementById('ocrLang').value;
+  OCR_STATUS.textContent = 'Recognizing text...';
+
+  // Convert img to data URL for Tesseract
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const dataUrl = c.toDataURL('image/png');
+
+  try {
+    const result = await Tesseract.recognize(dataUrl, lang, {
+      logger: m => { if (m.status === 'recognizing text') OCR_STATUS.textContent = 'Recognizing: ' + Math.round(m.progress * 100) + '%'; }
+    });
+    const text = result.data.text.trim();
+    if (text) {
+      OCR_TEXT.textContent = text;
+      OCR_RESULT.style.display = 'block';
+      OCR_STATUS.textContent = 'Extracts text from images using Tesseract.js';
+      toast('Text extracted: ' + text.split('\n').length + ' lines');
+    } else {
+      OCR_STATUS.innerHTML = '<span style="color:#e17055">No text found. Try a different language or clearer image.</span>';
+    }
+  } catch (e) {
+    OCR_STATUS.innerHTML = '<span style="color:#e17055">OCR error: ' + esc(e.message) + '</span>';
+  }
+
+  // Return original blob
+  return { blob: item.file, dataUrl: URL.createObjectURL(item.file) };
+}
+
+let _tesseractLoading = false;
+async function loadTesseract() {
+  if (_tesseractLoading) return new Promise(r => { const ch = setInterval(() => { if (typeof Tesseract !== 'undefined') { clearInterval(ch); r(); } }, 100); });
+  _tesseractLoading = true;
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js';
+    s.onload = () => { setTimeout(resolve, 500); };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// ─── Compare Before/After Slider ─────────────────────────
+const COMPARE_MODAL = document.getElementById('compareModal');
+const COMPARE_BEFORE = document.getElementById('compareBefore');
+const COMPARE_AFTER = document.getElementById('compareAfter');
+const COMPARE_OVERLAY = document.getElementById('compareOverlay');
+const COMPARE_CONTAINER = document.getElementById('compareContainer');
+const COMPARE_LABEL = document.getElementById('compareLabel');
+
+document.getElementById('compareModalClose').addEventListener('click', () => COMPARE_MODAL.classList.remove('open'));
+COMPARE_MODAL.addEventListener('click', e => { if (e.target === e.currentTarget) COMPARE_MODAL.classList.remove('open'); });
+
+let _compareDragging = false;
+COMPARE_CONTAINER.addEventListener('mousedown', () => _compareDragging = true);
+document.addEventListener('mouseup', () => _compareDragging = false);
+document.addEventListener('mousemove', e => {
+  if (!_compareDragging || !COMPARE_MODAL.classList.contains('open')) return;
+  const rect = COMPARE_CONTAINER.getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  COMPARE_OVERLAY.style.width = (x * 100) + '%';
+  document.getElementById('compareHandle').style.left = (x * 100) + '%';
+});
+// Touch support
+COMPARE_CONTAINER.addEventListener('touchstart', () => _compareDragging = true);
+document.addEventListener('touchend', () => _compareDragging = false);
+document.addEventListener('touchmove', e => {
+  if (!_compareDragging || !COMPARE_MODAL.classList.contains('open')) return;
+  const t = e.touches[0];
+  const rect = COMPARE_CONTAINER.getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (t.clientX - rect.left) / rect.width));
+  COMPARE_OVERLAY.style.width = (x * 100) + '%';
+  document.getElementById('compareHandle').style.left = (x * 100) + '%';
+});
+
+function openCompare(item) {
+  if (!item.origUrl || !item.finalUrl) return;
+  COMPARE_BEFORE.src = item.origUrl;
+  COMPARE_AFTER.src = item.finalUrl;
+  COMPARE_LABEL.textContent = item.name;
+  COMPARE_OVERLAY.style.width = '50%';
+  document.getElementById('compareHandle').style.left = '50%';
+  COMPARE_MODAL.classList.add('open');
+}
+
+// ─── Undo / History ──────────────────────────────────────
+function undoItem(item) {
+  if (!item.history || !item.history.length) return;
+  const prev = item.history.pop();
+  if (prev) {
+    if (item.finalUrl) URL.revokeObjectURL(item.finalUrl);
+    item.finalBlob = prev.blob;
+    item.finalSize = prev.blob.size;
+    item.finalUrl = prev.url;
+    const card = GRID.querySelector(`[data-id="${item.id}"]`);
+    if (card) {
+      card.querySelector('.card-img').src = item.finalUrl;
+      card.querySelector('.btn-und').disabled = item.history.length === 0;
+    }
+    updateCard(item, 'done', '', item.finalUrl);
+    toast('Undone');
+  }
+}
+
+// ─── URL Import ──────────────────────────────────────────
+document.getElementById('urlLoadBtn').addEventListener('click', importFromUrl);
+document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') importFromUrl(); });
+
+async function importFromUrl() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) { toast('Paste an image URL'); return; }
+  document.getElementById('urlLoadBtn').disabled = true;
+  document.getElementById('urlLoadBtn').textContent = 'Loading...';
+  try {
+    const res = await fetch('/api/fetch-image?url=' + encodeURIComponent(url));
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || 'Failed to fetch'); }
+    const blob = await res.blob();
+    const fileName = url.split('/').pop().split('?')[0] || 'image.jpg';
+    const file = new File([blob], fileName, { type: blob.type });
+    addItem(file);
+    document.getElementById('urlInput').value = '';
+    toast('Image loaded from URL');
+  } catch (e) { toast('URL error: ' + e.message); }
+  finally { document.getElementById('urlLoadBtn').disabled = false; document.getElementById('urlLoadBtn').textContent = 'Load'; }
+}
+
+// ─── Cloud Storage Import ────────────────────────────────
+const GDRIVE_KEY = localStorage.getItem('gdrive_api_key') || '';
+const DROPBOX_KEY = localStorage.getItem('dropbox_app_key') || '';
+
+document.getElementById('gdriveBtn').addEventListener('click', () => {
+  if (!GDRIVE_KEY) {
+    const key = prompt('Enter your Google Drive API Key:\n(Get one at https://console.cloud.google.com/apis/credentials)');
+    if (key) { localStorage.setItem('gdrive_api_key', key); location.reload(); }
+    return;
+  }
+  loadGdrivePicker();
+});
+
+document.getElementById('dropboxBtn').addEventListener('click', () => {
+  if (!DROPBOX_KEY) {
+    const key = prompt('Enter your Dropbox App Key:\n(Get one at https://www.dropbox.com/developers/apps)');
+    if (key) { localStorage.setItem('dropbox_app_key', key); location.reload(); }
+    return;
+  }
+  loadDropboxChooser();
+});
+
+let _gdriveLoaded = false;
+async function loadGdrivePicker() {
+  if (_gdriveLoaded) return;
+  _gdriveLoaded = true;
+  // Google Picker API uses a callback approach
+  window.gdriveCallback = (data) => {
+    if (data.action === 'picked' && data.docs && data.docs.length) {
+      const doc = data.docs[0];
+      if (doc.type === 'photo' || doc.mimeType.startsWith('image/')) {
+        fetch('/api/fetch-image?url=' + encodeURIComponent(doc.url))
+          .then(r => r.blob()).then(blob => {
+            const file = new File([blob], doc.name || 'drive-image.jpg', { type: blob.type });
+            addItem(file);
+          }).catch(e => toast('Drive error: ' + e.message));
+      }
+    }
+  };
+  // Simple fallback: open Google Drive in a new tab and user can copy URL
+  toast('Configure Google Drive API key or paste a Drive share link in the URL field');
+  window.open('https://drive.google.com', '_blank');
+}
+
+async function loadDropboxChooser() {
+  try {
+    if (window.Dropbox) return openDropboxChooser();
+    const s = document.createElement('script');
+    s.src = 'https://www.dropbox.com/static/api/2/dropins.js';
+    s.id = 'dropboxjs';
+    s.setAttribute('data-app-key', DROPBOX_KEY);
+    s.onload = () => setTimeout(openDropboxChooser, 500);
+    document.head.appendChild(s);
+  } catch (e) { toast('Dropbox error: ' + e.message); }
+}
+
+function openDropboxChooser() {
+  if (!window.Dropbox) { toast('Dropbox SDK not loaded'); return; }
+  window.Dropbox.choose({
+    linkType: 'preview',
+    multiselect: true,
+    extensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif', '.avif'],
+    success: files => {
+      files.forEach(f => {
+        fetch('/api/fetch-image?url=' + encodeURIComponent(f.link))
+          .then(r => r.blob()).then(blob => {
+            const file = new File([blob], f.name, { type: blob.type });
+            addItem(file);
+          }).catch(e => toast('Dropbox error: ' + e.message));
+      });
+    }
+  });
+}
+document.getElementById('reprocessAllBtn').addEventListener('click', () => {
+  if (!items.length) return;
+  for (const item of items) {
+    if (item.origUrl) URL.revokeObjectURL(item.origUrl);
+    if (item.finalUrl) URL.revokeObjectURL(item.finalUrl);
+    item.finalBlob = null; item.finalSize = null; item.finalUrl = null; item.status = 'pending';
+    const card = GRID.querySelector(`[data-id="${item.id}"]`);
+    if (card) {
+      card.querySelector('.card-img').src = '';
+      card.querySelector('.status').textContent = 'Queued...';
+      card.querySelector('.btn-dl').disabled = true;
+      card.querySelector('.btn-cmp').disabled = true;
+      card.querySelector('.btn-und').disabled = true;
+      card.querySelector('.card-badges').style.display = 'none';
+    }
+  }
+  processSequential(items.slice());
+  toast('Reprocessing ' + items.length + ' images');
+});
+
+document.getElementById('applyAllBtn').addEventListener('click', () => {
+  if (!items.length) { toast('No items'); return; }
+  processSequential(items.slice());
+  toast('Re-applying to ' + items.length + ' images');
+});
+
+// Process items sequentially, yielding between each to keep UI responsive
+function processSequential(queue) {
+  if (!queue.length) return;
+  const item = queue.shift();
+  // Use setTimeout to yield to browser paint/compositing
+  setTimeout(() => {
+    processItem(item);
+    // Use requestIdleCallback for next batch to avoid jank
+    if (queue.length) requestIdleCallback(() => processSequential(queue), { timeout: 200 });
+  }, 0);
+}
+
+// ─── UI extras ────────────────────────────────────────────
+// Crop aspect ratio buttons
+document.querySelectorAll('.crop-ar').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.crop-ar').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const info = document.getElementById('cropInfo');
+    if (btn.dataset.ar === 'free') info.textContent = '';
+    else info.textContent = `Aspect: ${btn.dataset.ar}`;
+  });
+});
+
+// Range sliders live values
+['fltGray','fltSepia','fltBlur','fltBright','fltContrast','fltSat'].forEach(id => {
+  const el = document.getElementById(id);
+  const v = document.getElementById(id + 'V');
+  if (el && v) el.addEventListener('input', () => {
+    v.textContent = (id === 'fltBlur') ? el.value + 'px' : el.value + '%';
+    applyFilterPreview();
+  });
+});
+
+function applyFilterPreview() {
+  const gray = (parseInt(document.getElementById('fltGray').value) || 0) / 100;
+  const sepia = (parseInt(document.getElementById('fltSepia').value) || 0) / 100;
+  const blur = parseFloat(document.getElementById('fltBlur').value) || 0;
+  const bright = (parseInt(document.getElementById('fltBright').value) || 100) / 100;
+  const contrast = (parseInt(document.getElementById('fltContrast').value) || 100) / 100;
+  const sat = (parseInt(document.getElementById('fltSat').value) || 100) / 100;
+  const filters = [];
+  if (gray) filters.push(`grayscale(${gray})`);
+  if (sepia) filters.push(`sepia(${sepia})`);
+  if (blur) filters.push(`blur(${blur}px)`);
+  if (bright !== 1) filters.push(`brightness(${bright})`);
+  if (contrast !== 1) filters.push(`contrast(${contrast})`);
+  if (sat !== 1) filters.push(`saturate(${sat})`);
+  const filterStr = filters.join(' ') || 'none';
+  GRID.querySelectorAll('.card-img').forEach(img => { img.style.filter = filterStr; });
+  // Add a reset button if any filter is active
+  let resetBtn = document.getElementById('resetFiltersBtn');
+  if (filters.length) {
+    if (!resetBtn) {
+      resetBtn = document.createElement('button');
+      resetBtn.id = 'resetFiltersBtn';
+      resetBtn.className = 'btn btn-outline';
+      resetBtn.style.cssText = 'padding:3px 10px;font-size:.75rem;margin-left:8px';
+      resetBtn.textContent = '\u21BA Reset';
+      resetBtn.addEventListener('click', () => {
+        document.getElementById('fltGray').value = 0; document.getElementById('fltGrayV').textContent = '0%';
+        document.getElementById('fltSepia').value = 0; document.getElementById('fltSepiaV').textContent = '0%';
+        document.getElementById('fltBlur').value = 0; document.getElementById('fltBlurV').textContent = '0px';
+        document.getElementById('fltBright').value = 100; document.getElementById('fltBrightV').textContent = '100%';
+        document.getElementById('fltContrast').value = 100; document.getElementById('fltContrastV').textContent = '100%';
+        document.getElementById('fltSat').value = 100; document.getElementById('fltSatV').textContent = '100%';
+        applyFilterPreview();
+      });
+      document.querySelector('.tool-panel[data-tool="filters"]').appendChild(resetBtn);
+    }
+  } else if (resetBtn) { resetBtn.remove(); }
+}
+const rgbTol = document.getElementById('rgbTol');
+const rgbTolV = document.getElementById('rgbTolV');
+if (rgbTol && rgbTolV) rgbTol.addEventListener('input', () => { rgbTolV.textContent = rgbTol.value; });
+const rgbMode = document.getElementById('rgbMode');
+if (rgbMode) rgbMode.addEventListener('change', () => {
+  document.getElementById('rgbKeyLabel').style.display = rgbMode.value === 'chroma' ? '' : 'none';
+  if (rgbMode.value === 'smart') document.getElementById('rgbKey').value = '#00ff00';
+});
+
+// Batch download all as ZIP
+document.getElementById('downloadAllBtn').addEventListener('click', async () => {
+  const doneItems = items.filter(i => i.finalBlob);
+  if (!doneItems.length) { toast('No processed images to download'); return; }
+  try {
+    const JSZip = window.JSZip;
+    if (!JSZip) { toast('JSZip library not loaded'); return; }
+    const zip = new JSZip();
+    for (const item of doneItems) {
+      let ext = '.bin';
+      const t = item.finalBlob.type;
+      if (t.includes('pdf')) ext = '.pdf';
+      else if (t.includes('jpeg')||t.includes('jpg')) ext = '.jpg';
+      else if (t.includes('png')) ext = '.png';
+      else if (t.includes('webp')) ext = '.webp';
+      else if (t.includes('gif')) ext = '.gif';
+      else if (t.includes('bmp')) ext = '.bmp';
+      zip.file(item.name.replace(/\.[^.]+$/, '') + ext, item.finalBlob);
+    }
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = 'images.zip';
+    document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 100);
+  } catch (e) { toast('Zip error: ' + e.message); }
+});
+
+// ─── Helpers ──────────────────────────────────────────────
+function checkAlphaSmall(img) {
+  const c = document.createElement('canvas'); c.width=64; c.height=64;
+  const ctx = c.getContext('2d'); ctx.drawImage(img,0,0,64,64);
+  const d = ctx.getImageData(0,0,64,64).data;
+  let t = 0;
+  for (let i = 3; i < d.length; i += 4) if (d[i] < 254) t++;
+  return t / (d.length / 4) > 0.02;
+}
+
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => {
+      const r = new FileReader();
+      r.onload = e => { const f = new Image(); f.onload = () => resolve(f); f.onerror = () => reject(new Error('Failed to decode')); f.src = e.target.result; };
+      r.onerror = () => reject(new Error('Failed to read'));
+      r.readAsDataURL(file);
+    };
+    img.src = url;
+  });
+}
+
+function blobFromCanvas(c, mime, q) {
+  return new Promise(resolve => { try { c.toBlob(b => resolve(b||new Blob([])), mime, q); } catch { resolve(new Blob([])); } });
+}
+
+function downloadOne(item) {
+  if (!item.finalBlob) return;
+  const a = document.createElement('a');
+  let ext = '.bin';
+  const t = item.finalBlob.type;
+  if (t.includes('pdf')) ext = '.pdf';
+  else if (t.includes('jpeg')||t.includes('jpg')) ext = '.jpg';
+  else if (t.includes('png')) ext = '.png';
+  else if (t.includes('webp')) ext = '.webp';
+  else if (t.includes('gif')) ext = '.gif';
+  else if (t.includes('bmp')) ext = '.bmp';
+  a.href = URL.createObjectURL(item.finalBlob);
+  a.download = item.name.replace(/\.[^.]+$/, '') + ext;
+  document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); }, 100);
+}
+
+function removeItem(id) {
+  const item = items.find(i=>i.id===id);
+  if (item) { if (item.origUrl) URL.revokeObjectURL(item.origUrl); if (item.finalUrl) URL.revokeObjectURL(item.finalUrl); }
+  items = items.filter(i=>i.id!==id);
+  const card = GRID.querySelector(`[data-id="${id}"]`);
+  if (card) card.remove();
+  document.getElementById('batchBar').style.display = (activeTool !== 'merge' && items.length > 0) ? 'block' : 'none';
+  document.getElementById('downloadAllBtn').textContent = `\u{1F4E5} Download All as ZIP (${items.length})`;
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function toast(msg) { TOAST.textContent = msg; TOAST.classList.add('show'); clearTimeout(TOAST._t); TOAST._t = setTimeout(() => TOAST.classList.remove('show'), 3000); }
+
+// ─── Init ────────────────────────────────────────────────
+document.getElementById('dashArea').innerHTML = `<div class="free-banner">
+  <span>&#x1F512; Free mode — all tools run client-side in your browser</span>
+</div>`;
+
+// Load JSZip for zip support
+if (!window.JSZip) {
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+  document.head.appendChild(s);
+}
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+// Random tip in the tools page
+(function randomTip() {
+  const tips = [
+    '\u{1F4A1} Tip: Drag multiple images at once for batch processing',
+    '\u{1F4A1} Tip: Use the Compress tool to squeeze images under any KB limit',
+    '\u{1F4A1} Tip: The Compare button (after processing) shows a before/after slider',
+    '\u{1F4A1} Tip: You can undo up to 20 steps per image with the \u{21A9} button',
+    '\u{1F4A1} Tip: Download All as ZIP grabs everything in one go',
+    '\u{1F4A1} Tip: WebP is usually 25-35% smaller than JPEG at the same quality',
+    '\u{1F4A1} Tip: Paste an image URL directly instead of downloading first',
+    '\u{1F4A1} Tip: Smart Fill for Remove Watermark works best on solid backgrounds',
+    '\u{1F4A1} Tip: Anything you do here stays in your browser. No uploads, ever.',
+  ];
+  const tip = tips[Math.floor(Math.random() * tips.length)];
+  const el = document.getElementById('dashArea');
+  if (el) {
+    const t = document.createElement('div');
+    t.className = 'free-banner';
+    t.style.marginBottom = '6px';
+    t.style.fontSize = '.8rem';
+    t.innerHTML = tip;
+    if (el.nextSibling) el.parentNode.insertBefore(t, el.nextSibling);
+    else el.parentNode.appendChild(t);
+  }
+})();
+</script>
+<footer>Made with &#9749; and &#10084;&#65039; &mdash; no servers, no uploads, just your browser doing the work.</footer>
+</body>
+</html>
